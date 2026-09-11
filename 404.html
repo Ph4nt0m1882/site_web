@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Ressource introuvable</title>
+  <meta name="description" content="Le conteneur tourne parfaitement, mais la route demandée semble perdue dans le vide intersidéral.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Canvas d'arrière-plan avec poussière d'étoiles et nébuleuse -->
+  <canvas id="space-canvas"></canvas>
+
+  <!-- Lueur ambiante d'arrière-plan -->
+  <div class="ambient-glow glow-top-left"></div>
+  <div class="ambient-glow glow-bottom-right"></div>
+
+  <main class="page-container">
+    <!-- Carte principale 3D -->
+    <div class="error-card" id="tilt-card">
+      <!-- Reflet de lumière sur la bordure -->
+      <div class="card-glass-reflection"></div>
+
+      <!-- Badge statut système -->
+      <div class="badge-wrapper">
+        <div class="status-badge" role="status" aria-live="polite">
+          <span class="pulsing-dot" aria-hidden="true"></span>
+          <span class="badge-text">ERREUR SYSTÈME</span>
+        </div>
+      </div>
+
+      <!-- Code 404 Métallique / 3D -->
+      <div class="code-container">
+        <h1 class="error-code" data-text="404">404</h1>
+      </div>
+
+      <!-- Titre & Description -->
+      <div class="message-content">
+        <h2 class="error-title">Ressource introuvable</h2>
+        <p class="error-description">
+          Le conteneur tourne parfaitement, mais la route demandée semble perdue dans le vide intersidéral.
+        </p>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="action-buttons">
+        <button type="button" class="btn btn-primary" id="btn-retry" aria-label="Réessayer la connexion">
+          <span class="btn-spinner" aria-hidden="true"></span>
+          <span class="btn-text">Réessayer</span>
+        </button>
+        <button type="button" class="btn btn-secondary" id="btn-back" aria-label="Revenir en arrière">
+          <span class="btn-text">Retour</span>
+        </button>
+      </div>
+
+      <!-- Informations techniques repliables -->
+      <div class="diagnostics-toggle-container">
+        <button type="button" class="diagnostics-toggle" id="diagnostics-toggle" aria-expanded="false" aria-controls="diagnostics-panel">
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+          <span>Détails du conteneur</span>
+        </button>
+
+        <div class="diagnostics-panel" id="diagnostics-panel" hidden>
+          <div class="diag-grid">
+            <div class="diag-item">
+              <span class="diag-label">Statut HTTP</span>
+              <span class="diag-value status-error">404 Not Found</span>
+            </div>
+            <div class="diag-item">
+              <span class="diag-label">Conteneur</span>
+              <span class="diag-value" id="diag-server">Apache HTTPD (Alpine/OCP)</span>
+            </div>
+            <div class="diag-item">
+              <span class="diag-label">Route demandée</span>
+              <span class="diag-value code-font" id="diag-route">/</span>
+            </div>
+            <div class="diag-item">
+              <span class="diag-label">Horodatage</span>
+              <span class="diag-value code-font" id="diag-time">--:--:--</span>
+            </div>
+            <div class="diag-item">
+              <span class="diag-label">Latence liaison</span>
+              <span class="diag-value status-ok" id="diag-ping">0.4 ms</span>
+            </div>
+            <div class="diag-item">
+              <span class="diag-label">Moteur Docker</span>
+              <span class="diag-value status-ok">En cours d'exécution ●</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Notification toast interactive pour le bouton réessayer -->
+    <div class="toast" id="status-toast" role="alert" aria-live="assertive"></div>
+
+    <!-- Footer discret -->
+    <footer class="page-footer">
+      <span>Conteneur propulsé par <code>quay.io/ocp-edge-qe/httpd</code></span>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

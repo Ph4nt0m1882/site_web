@@ -1,0 +1,10 @@
+services:
+  httpd:
+    image: quay.io/ocp-edge-qe/httpd
+    container_name: web-404-service
+    ports:
+      - "80:80"
+    volumes:
+      - .:/usr/local/apache2/htdocs/:ro
+      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+    restart: unless-stopped
