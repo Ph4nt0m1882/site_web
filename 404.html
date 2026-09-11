@@ -6,6 +6,15 @@
   <title>404 — Ressource introuvable</title>
   <meta name="description" content="Le conteneur tourne parfaitement, mais la route demandée semble perdue dans le vide intersidéral.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <script>
+    // Résolution dynamique du chemin de base pour GitHub Pages et conteneur Docker
+    (function() {
+      var isGH = window.location.hostname.endsWith('github.io');
+      var segments = window.location.pathname.split('/').filter(Boolean);
+      var baseDir = isGH && segments.length > 0 ? '/' + segments[0] + '/' : '/';
+      document.write('<base href="' + baseDir + '">');
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">

@@ -62,3 +62,24 @@ docker compose up -d
 Une fois le conteneur démarré :
 - Page d'accueil : [http://localhost](http://localhost) (ou [http://localhost:8080](http://localhost:8080))
 - Test d'une route inconnue (404) : [http://localhost/route-inexistante](http://localhost/route-inexistante)
+
+---
+
+## 🚀 Déploiement GitHub Pages
+
+Un workflow GitHub Actions automatisé est configuré dans `.github/workflows/deploy.yml`.
+
+### Configuration sur GitHub :
+1. Poussez votre branche sur GitHub :
+   ```bash
+   git add .
+   git commit -m "feat: add GitHub Pages deployment workflow"
+   git push origin main
+   ```
+2. Rendez-vous sur votre dépôt GitHub : **Settings** > **Pages**.
+3. Dans la section **Build and deployment** :
+   - Sous **Source**, sélectionnez **GitHub Actions**.
+4. Le déploiement s'exécutera automatiquement à chaque push sur la branche `main`.
+5. Votre site sera accessible à l'adresse :
+   **`https://<votre-compte>.github.io/site_web/`** (par exemple `https://Ph4nt0m1882.github.io/site_web/`)
+

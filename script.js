@@ -163,6 +163,11 @@ function initDiagnostics() {
     pingElem.textContent = `${fakePing} ms`;
   }
 
+  const serverElem = document.getElementById('diag-server');
+  if (serverElem && window.location.hostname.endsWith('github.io')) {
+    serverElem.textContent = 'GitHub Pages (Fastly CDN)';
+  }
+
   if (toggleBtn && panel) {
     toggleBtn.addEventListener('click', () => {
       const isHidden = panel.hidden;
@@ -210,7 +215,7 @@ function initActionButtons() {
           }
         })
         .catch(() => {
-          showToast('⚠️ Serveur conteneur inaccessible. Vérifiez Docker.');
+          showToast('⚠️ Serveur inaccessible. Vérifiez la connexion.');
         })
         .finally(() => {
           setTimeout(() => {
@@ -226,7 +231,10 @@ function initActionButtons() {
       if (window.history.length > 1 && document.referrer) {
         window.history.back();
       } else {
-        window.location.href = '/';
+        const isGH = window.location.hostname.endsWith('github.io');
+        const segments = window.location.pathname.split('/').filter(Boolean);
+        const homePath = isGH && segments.length > 0 ? '/' + segments[0] + '/' : '/';
+        window.location.href = homePath;
       }
     });
   }
