@@ -1,6 +1,11 @@
 /**
  * Attention Heatmap & Transformer Runtime Visual Engine
  * Formule : Scores = (Q · Kᵀ) / √d_k -> Softmax -> Attention Map
+ * 
+ * Améliorations :
+ * 1. Softmax exponentiel contrasté (faisceau vainqueur hyper saturé / épais, extinction des autres)
+ * 2. Ancrage des Keys (K_i) avec point d'impact, onde de choc pulsante et micro-badge α temps réel
+ * 3. Parallaxe 3D magnétique couplée en continu à la Query Q
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,10 +20,10 @@ class AttentionEngine {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
-    // Dimension latente des vecteurs (ex: d_k = 32)
+    // Dimension latente des vecteurs
     this.d_k = 32;
     this.sqrt_dk = Math.sqrt(this.d_k);
-    this.temperature = 1.0;
+    this.temperature = 0.65; // Température affûtée pour accentuer la dynamique Softmax
     this.currentHead = 0; // 0: Spatial, 1: Sémantique, 2: Vélocité
 
     // Curseur = Query (Q)
@@ -40,28 +45,37 @@ class AttentionEngine {
     // Grille de patchs spatiaux pour le fond (Vision Transformer style)
     this.gridCols = 20;
     this.gridRows = 14;
-    this.patchKeys = []; // Array of Float32Array
+    this.patchKeys = [];
     this.patchAttention = new Float32Array(this.gridCols * this.gridRows);
 
     // Tokens DOM interactifs (Keys & Values)
     this.tokens = [
-      { id: 'hero', name: 'Profil Ph4nt0m', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
-      { id: 'portfolio', name: 'Portfolio', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
-      { id: 'lab', name: 'AI Lab', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
-      { id: 'github', name: 'GitHub', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
-      { id: 'server', name: 'Nœud Serveur', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
-      { id: 'inspector', name: 'Inspecteur', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 }
+      { id: 'hero', keyLabel: 'K₀', name: 'Profil Ph4nt0m', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
+      { id: 'portfolio', keyLabel: 'K₁', name: 'Portfolio', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
+      { id: 'lab', keyLabel: 'K₂', name: 'AI Lab', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
+      { id: 'github', keyLabel: 'K₃', name: 'GitHub', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
+      { id: 'server', keyLabel: 'K₄', name: 'Nœud Serveur', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
+      { id: 'inspector', keyLabel: 'K₅', name: 'Inspecteur', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 }
     ];
 
     // Particules synaptiques le long des faisceaux d'attention
     this.synapticParticles = [];
-    for (let i = 0; i < 36; i++) {
+    for (let i = 0; i < 48; i++) {
       this.synapticParticles.push({
-        targetIndex: 0,
+        targetIndex: i % this.tokens.length,
         progress: Math.random(),
-        speed: 0.008 + Math.random() * 0.012
+        speed: 0.012 + Math.random() * 0.018
       });
     }
+
+    // Physique 3D de la carte (Parallaxe magnétique)
+    this.card = document.getElementById('tilt-card');
+    this.cardTilt = {
+      rx: 0,
+      ry: 0,
+      tx: 0,
+      ty: 0
+    };
 
     // Statistiques FPS & Télémétrie
     this.lastFrameTime = performance.now();
@@ -69,15 +83,13 @@ class AttentionEngine {
     this.frameCount = 0;
     this.lastFpsUpdate = performance.now();
 
-    // DOM Télémétrie & HUD
+    // Éléments du HUD
     this.hudArgmax = document.getElementById('hud-argmax');
     this.hudFps = document.getElementById('hud-fps');
     this.hudHead = document.getElementById('hud-head');
     this.metricQnorm = document.getElementById('metric-qnorm');
     this.metricSpeed = document.getElementById('metric-speed');
     this.softmaxContainer = document.getElementById('softmax-bars');
-
-    this.card = document.getElementById('tilt-card');
   }
 
   init() {
@@ -87,10 +99,9 @@ class AttentionEngine {
     this.initSpatialGrid();
     this.initTokenEmbeddings();
     this.initListeners();
-    this.initTiltEffect();
     this.initInspectorUI();
 
-    // Boucle de rendu mathématique à 60 FPS
+    // Démarrage de la boucle d'animation
     requestAnimationFrame((t) => this.render(t));
   }
 
@@ -105,26 +116,21 @@ class AttentionEngine {
    * -------------------------------------------------------------------------- */
   initSpatialGrid() {
     this.patchKeys = [];
-    const totalPatches = this.gridCols * this.gridRows;
-
     for (let r = 0; r < this.gridRows; r++) {
       for (let c = 0; c < this.gridCols; c++) {
         const u = (c + 0.5) / this.gridCols;
         const v = (r + 0.5) / this.gridRows;
 
         const K = new Float32Array(this.d_k);
-        // Positional Encoding sinusoïdal 2D (Vaswani et al. adapté en 2D)
         for (let i = 0; i < this.d_k / 2; i++) {
           const freq = 1 / Math.pow(1000, (2 * i) / this.d_k);
           K[2 * i] = Math.sin(u * Math.PI * 2 * freq) * 0.7;
           K[2 * i + 1] = Math.cos(v * Math.PI * 2 * freq) * 0.7;
         }
 
-        // Bruit harmonique unique au patch
         K[0] += Math.sin(c * 1.5) * 0.25;
         K[1] += Math.cos(r * 1.5) * 0.25;
 
-        // Normalisation L2 du vecteur clé
         this.normalizeVector(K);
         this.patchKeys.push(K);
       }
@@ -136,20 +142,16 @@ class AttentionEngine {
       token.elem = document.querySelector(`[data-token-id="${token.id}"]`);
       token.badge = document.getElementById(`score-${token.id}`);
 
-      // Vecteur sémantique caractéristique de chaque token (dimension d_k)
       token.K = new Float32Array(this.d_k);
-
-      // Empreinte sémantique spécifique
-      const seed = (idx + 1) * 3.7;
+      const seed = (idx + 1) * 4.2;
       for (let i = 0; i < this.d_k; i++) {
         token.K[i] = Math.sin(seed * (i + 1)) * 0.6;
       }
 
-      // Renforcer certaines dimensions sémantiques
-      if (token.id === 'portfolio') token.K[2] += 0.8;
-      if (token.id === 'lab') token.K[5] += 0.9;
-      if (token.id === 'github') token.K[8] += 0.8;
-      if (token.id === 'server') token.K[12] += 0.9;
+      if (token.id === 'portfolio') token.K[2] += 0.85;
+      if (token.id === 'lab') token.K[5] += 0.95;
+      if (token.id === 'github') token.K[8] += 0.85;
+      if (token.id === 'server') token.K[12] += 0.95;
 
       this.normalizeVector(token.K);
     });
@@ -161,10 +163,23 @@ class AttentionEngine {
     this.tokens.forEach((token) => {
       if (!token.elem) return;
       const rect = token.elem.getBoundingClientRect();
-      token.pos = {
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2
-      };
+      // Point d'ancrage précis sur l'icône/gauche du composant pour les cartes
+      if (token.id === 'hero') {
+        token.pos = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + 40
+        };
+      } else if (token.id === 'inspector') {
+        token.pos = {
+          x: rect.left + 32,
+          y: rect.top + rect.height / 2
+        };
+      } else {
+        token.pos = {
+          x: rect.left + 36,
+          y: rect.top + rect.height / 2
+        };
+      }
     });
   }
 
@@ -188,10 +203,9 @@ class AttentionEngine {
 
     window.addEventListener('scroll', () => this.updateTokenPositions());
 
-    // Sélecteur de têtes d'attention (Multi-Head)
     const headBtns = document.querySelectorAll('.head-btn');
     headBtns.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         headBtns.forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         this.currentHead = parseInt(btn.getAttribute('data-head'), 10) || 0;
@@ -204,7 +218,6 @@ class AttentionEngine {
   }
 
   updateQueryVector(timeSec) {
-    // Lissage du curseur pour une vélocité stable
     const lerp = 0.22;
     this.mouse.x += (this.mouse.targetX - this.mouse.x) * lerp;
     this.mouse.y += (this.mouse.targetY - this.mouse.y) * lerp;
@@ -216,31 +229,22 @@ class AttentionEngine {
     this.mouse.prevX = this.mouse.x;
     this.mouse.prevY = this.mouse.y;
 
-    // Coordonnées normalisées [0, 1]
     const u = this.mouse.x / this.width;
     const v = this.mouse.y / this.height;
 
-    // Construction du vecteur Query Q(t)
     for (let i = 0; i < this.d_k / 2; i++) {
       const freq = 1 / Math.pow(1000, (2 * i) / this.d_k);
-
-      // Positional Encoding sinusoïdal
       const pe_x = Math.sin(u * Math.PI * 2 * freq);
       const pe_y = Math.cos(v * Math.PI * 2 * freq);
-
-      // Composante temporelle harmonique (fluctuation quantique des neurones)
       const timeOsc = Math.sin(timeSec * 1.8 + i) * 0.15;
 
       this.Q[2 * i] = pe_x + timeOsc;
       this.Q[2 * i + 1] = pe_y + timeOsc;
     }
 
-    // Modulation selon la tête d'attention active
     if (this.currentHead === 1) {
-      // Tête sémantique : amplification des dimensions intermédiaires
       for (let i = 4; i < 16; i++) this.Q[i] *= 1.4;
     } else if (this.currentHead === 2) {
-      // Tête vélocité : injection de la vitesse
       const vNorm = Math.min(this.mouse.speed / 20, 1.5);
       this.Q[0] += this.mouse.vx * 0.05 * vNorm;
       this.Q[1] += this.mouse.vy * 0.05 * vNorm;
@@ -260,50 +264,46 @@ class AttentionEngine {
   }
 
   /* --------------------------------------------------------------------------
-   * 3. Calcul Scaled Dot-Product Attention : Scores = (Q · Kᵀ) / √d_k
+   * 3. Calcul Scaled Dot-Product Attention & Softmax Amplifié
    * -------------------------------------------------------------------------- */
   computeAttention() {
-    // 3.1 Calcul sur la grille spatiale de fond
+    // 3.1 Grille spatiale
     const totalPatches = this.patchKeys.length;
-    let maxPatchScore = -Infinity;
-
     for (let i = 0; i < totalPatches; i++) {
       const K = this.patchKeys[i];
       let dot = 0;
       for (let d = 0; d < this.d_k; d++) {
         dot += this.Q[d] * K[d];
       }
-      // Scaled dot-product
-      const score = dot / this.sqrt_dk;
-      this.patchAttention[i] = score;
-      if (score > maxPatchScore) maxPatchScore = score;
+      this.patchAttention[i] = dot / this.sqrt_dk;
     }
 
-    // 3.2 Calcul sur les tokens DOM interactifs
+    // 3.2 Tokens DOM interactifs avec proximité géométrique renforcée
     let maxTokenScore = -Infinity;
     let sumExp = 0;
     const scores = [];
 
     this.tokens.forEach((token) => {
-      // Intégration de la proximité physique au curseur + embedding
       const dx = (this.mouse.x - token.pos.x) / this.width;
       const dy = (this.mouse.y - token.pos.y) / this.height;
       const distSq = dx * dx + dy * dy;
-      const proximity = Math.exp(-distSq * 18); // Proximité spatiale
+      
+      // Proximité exponentielle accentuée
+      const proximity = Math.exp(-distSq * 32);
 
       let dot = 0;
       for (let d = 0; d < this.d_k; d++) {
         dot += this.Q[d] * token.K[d];
       }
 
-      // Combinaison : Produit scalaire mis à l'échelle + bias de position
-      const score = (dot / this.sqrt_dk) * 0.65 + proximity * 0.85;
+      // Logit d'attention : le terme de proximité amplifie le logit quand on s'approche
+      const score = (dot / this.sqrt_dk) * 0.75 + proximity * 4.2;
       token.score = score;
       scores.push(score);
       if (score > maxTokenScore) maxTokenScore = score;
     });
 
-    // Normalisation Softmax : exp(s_i / tau) / sum(exp(s_j / tau))
+    // Softmax avec température nette tau = 0.65
     const tau = this.temperature;
     for (let i = 0; i < this.tokens.length; i++) {
       const expVal = Math.exp((scores[i] - maxTokenScore) / tau);
@@ -316,8 +316,8 @@ class AttentionEngine {
 
     for (let i = 0; i < this.tokens.length; i++) {
       const alpha = sumExp > 0 ? this.tokens[i].expVal / sumExp : 0;
-      // Lissage pour l'affichage visuel
-      this.tokens[i].alpha = this.tokens[i].alpha * 0.8 + alpha * 0.2;
+      // Lissage réactif
+      this.tokens[i].alpha = this.tokens[i].alpha * 0.75 + alpha * 0.25;
 
       if (this.tokens[i].alpha > maxAlpha) {
         maxAlpha = this.tokens[i].alpha;
@@ -331,35 +331,31 @@ class AttentionEngine {
 
   updateDOMTokenHighlights() {
     this.tokens.forEach((token) => {
-      const isMax = token === this.argmaxToken && token.alpha > 0.35;
+      const isMax = token === this.argmaxToken && token.alpha > 0.4;
 
-      // Mise à jour de la classe visuelle
       if (token.elem && token.elem.classList.contains('hub-card')) {
         token.elem.classList.toggle('max-attention', isMax);
       }
 
-      // Mise à jour du badge alpha
       if (token.badge) {
         token.badge.textContent = `α: ${token.alpha.toFixed(2)}`;
         token.badge.classList.toggle('active', isMax);
       }
     });
 
-    // Mise à jour de l'en-tête hero
     const heroPill = document.getElementById('score-hero');
     if (heroPill) {
       const val = heroPill.querySelector('.score-val');
       if (val) val.textContent = this.tokens[0].alpha.toFixed(2);
     }
 
-    // HUD Argmax
     if (this.hudArgmax && this.argmaxToken) {
       this.hudArgmax.textContent = `${this.argmaxToken.name} (${(this.argmaxToken.alpha * 100).toFixed(0)}%)`;
     }
   }
 
   /* --------------------------------------------------------------------------
-   * 4. Rendu Visuel Canvas : Attention Heatmap & Faisceaux Synaptiques
+   * 4. Rendu Visuel Canvas : Heatmap, Faisceaux Softmax & Ancrages Keys
    * -------------------------------------------------------------------------- */
   render(timestamp) {
     const timeSec = timestamp * 0.001;
@@ -373,26 +369,30 @@ class AttentionEngine {
       if (this.hudFps) this.hudFps.textContent = this.fps;
     }
 
-    // Actualisation mathématique du vecteur Q et de l'attention
     this.updateQueryVector(timeSec);
     this.computeAttention();
 
-    // Effacement de la toile
+    // Mise à jour de la parallaxe 3D magnétique couplée à Q
+    this.updateCardTilt();
+
     this.ctx.clearRect(0, 0, this.width, this.height);
 
-    // 4.1 Dessin de la Heatmap d'Attention Spatiale
+    // 4.1 Heatmap spatiale
     this.drawAttentionHeatmap();
 
-    // 4.2 Dessin de la Grille Subtile de Tokens
+    // 4.2 Grille de tokens
     this.drawTokenGrid();
 
-    // 4.3 Dessin des Faisceaux d'Attention (Attention Beams de Q vers K_i)
-    this.drawAttentionBeams();
+    // 4.3 Faisceaux d'attention Softmax
+    this.drawAttentionBeams(timeSec);
 
-    // 4.4 Dessin du réticule Query (Curseur)
+    // 4.4 Points d'ancrage Keys & micro-badges
+    this.drawKeyAnchors(timeSec);
+
+    // 4.5 Réticule Query (Curseur)
     this.drawQueryReticle();
 
-    // 4.5 Mise à jour de l'inspecteur Softmax si ouvert
+    // 4.6 Inspecteur Softmax
     this.updateInspectorMetrics();
 
     requestAnimationFrame((t) => this.render(t));
@@ -402,13 +402,10 @@ class AttentionEngine {
     const cellW = this.width / this.gridCols;
     const cellH = this.height / this.gridRows;
 
-    // Rayon d'interpolation gaussienne pour chaque patch
     for (let r = 0; r < this.gridRows; r++) {
       for (let c = 0; c < this.gridCols; c++) {
         const idx = r * this.gridCols + c;
         const score = this.patchAttention[idx];
-
-        // Normalisation d'intensité [0, 1]
         const intensity = Math.max(0, Math.min(1, (score + 0.3) * 0.85));
         if (intensity < 0.05) continue;
 
@@ -417,11 +414,9 @@ class AttentionEngine {
         const radius = Math.max(cellW, cellH) * 1.8;
 
         const grad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-        
-        // Palette Thermique Cyberpunk / Inferno : Indigo -> Cyan -> Amber -> Blanc
-        const alphaGrad = intensity * 0.22;
+        const alphaGrad = intensity * 0.20;
         grad.addColorStop(0, `rgba(56, 189, 248, ${alphaGrad})`);
-        grad.addColorStop(0.45, `rgba(129, 140, 248, ${alphaGrad * 0.6})`);
+        grad.addColorStop(0.45, `rgba(129, 140, 248, ${alphaGrad * 0.55})`);
         grad.addColorStop(1, 'rgba(7, 8, 12, 0)');
 
         this.ctx.fillStyle = grad;
@@ -431,13 +426,13 @@ class AttentionEngine {
       }
     }
 
-    // Halo thermique direct centré sur le curseur Query (Q)
+    // Halo direct sous le curseur Query (Q)
     const cursorGlowRadius = 240;
     const qGrad = this.ctx.createRadialGradient(
       this.mouse.x, this.mouse.y, 0,
       this.mouse.x, this.mouse.y, cursorGlowRadius
     );
-    qGrad.addColorStop(0, 'rgba(56, 189, 248, 0.25)');
+    qGrad.addColorStop(0, 'rgba(56, 189, 248, 0.28)');
     qGrad.addColorStop(0.35, 'rgba(129, 140, 248, 0.12)');
     qGrad.addColorStop(1, 'rgba(7, 8, 12, 0)');
 
@@ -452,69 +447,185 @@ class AttentionEngine {
     const cellH = this.height / this.gridRows;
 
     this.ctx.save();
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-
-    // Petits points de matrice aux intersections des tokens
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
     for (let r = 0; r <= this.gridRows; r++) {
       for (let c = 0; c <= this.gridCols; c++) {
-        const x = c * cellW;
-        const y = r * cellH;
-        this.ctx.fillRect(x - 1, y - 1, 2, 2);
+        this.ctx.fillRect(c * cellW - 1, r * cellH - 1, 2, 2);
       }
     }
     this.ctx.restore();
   }
 
-  drawAttentionBeams() {
-    // Relie le curseur Query (Q) aux tokens Keys (K_i) avec un faisceau lumineux proportionnel à alpha
-    this.tokens.forEach((token, idx) => {
-      if (token.alpha < 0.05) return;
+  /**
+   * Faisceaux d'attention avec vraie dynamique exponentielle Softmax :
+   * Le rayon vainqueur s'épaissit et s'illumine puissamment, les autres s'estompent.
+   */
+  drawAttentionBeams(timeSec) {
+    const qx = this.mouse.x;
+    const qy = this.mouse.y;
 
-      const qx = this.mouse.x;
-      const qy = this.mouse.y;
+    this.tokens.forEach((token, idx) => {
+      const alpha = token.alpha;
+      // Les rayons de faible poids s'estompent presque totalement
+      if (alpha < 0.03) return;
+
       const kx = token.pos.x;
       const ky = token.pos.y;
 
-      // Courbure de Bézier dynamique
       const midX = (qx + kx) / 2;
-      const midY = (qy + ky) / 2 - 30;
+      const midY = (qy + ky) / 2 - 25;
 
-      const beamAlpha = Math.min(0.85, token.alpha * 1.5);
-      const beamWidth = 1 + token.alpha * 3.5;
+      const isWinner = token === this.argmaxToken && alpha > 0.45;
+
+      // Courbe d'amplification exponentielle du Softmax
+      const expAlpha = Math.pow(alpha, 1.4);
 
       this.ctx.save();
-      this.ctx.beginPath();
-      this.ctx.moveTo(qx, qy);
-      this.ctx.quadraticCurveTo(midX, midY, kx, ky);
 
-      // Dégradé de la ligne synaptique
-      const grad = this.ctx.createLinearGradient(qx, qy, kx, ky);
-      grad.addColorStop(0, `rgba(56, 189, 248, ${beamAlpha})`);
-      grad.addColorStop(1, `rgba(129, 140, 248, ${beamAlpha * 0.4})`);
+      if (isWinner) {
+        // --- FAISCEAU VAINQUEUR HYPER-SATURÉ & ÉPAIS ---
+        // 1. Halo néon large
+        this.ctx.beginPath();
+        this.ctx.moveTo(qx, qy);
+        this.ctx.quadraticCurveTo(midX, midY, kx, ky);
+        this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+        this.ctx.lineWidth = 9 + alpha * 8;
+        this.ctx.shadowColor = '#38bdf8';
+        this.ctx.shadowBlur = 24;
+        this.ctx.stroke();
 
-      this.ctx.strokeStyle = grad;
-      this.ctx.lineWidth = beamWidth;
-      this.ctx.stroke();
+        // 2. Faisceau cyan/or saturé
+        this.ctx.beginPath();
+        this.ctx.moveTo(qx, qy);
+        this.ctx.quadraticCurveTo(midX, midY, kx, ky);
+        const winGrad = this.ctx.createLinearGradient(qx, qy, kx, ky);
+        winGrad.addColorStop(0, `rgba(56, 189, 248, ${0.85 + alpha * 0.15})`);
+        winGrad.addColorStop(0.7, `rgba(129, 140, 248, 0.9)`);
+        winGrad.addColorStop(1, `rgba(251, 191, 36, 0.95)`);
+        this.ctx.strokeStyle = winGrad;
+        this.ctx.lineWidth = 3.5 + alpha * 4.5;
+        this.ctx.stroke();
 
-      // Particule glissante le long de la ligne synaptique
+        // 3. Cœur laser blanc incandescent
+        this.ctx.beginPath();
+        this.ctx.moveTo(qx, qy);
+        this.ctx.quadraticCurveTo(midX, midY, kx, ky);
+        this.ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(1, alpha * 1.3)})`;
+        this.ctx.lineWidth = 1.6;
+        this.ctx.shadowBlur = 0;
+        this.ctx.stroke();
+
+      } else {
+        // --- FAISCEAU SECONDAIRE ATTÉNUÉ & DISCRET ---
+        const beamAlpha = expAlpha * 0.35;
+        const beamWidth = 0.8 + expAlpha * 1.5;
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(qx, qy);
+        this.ctx.quadraticCurveTo(midX, midY, kx, ky);
+        this.ctx.strokeStyle = `rgba(129, 140, 248, ${beamAlpha})`;
+        this.ctx.lineWidth = beamWidth;
+        this.ctx.stroke();
+      }
+
+      // Particules d'activation synaptique
       this.synapticParticles.forEach((p) => {
         if (p.targetIndex === idx) {
-          p.progress += p.speed;
+          const speedMultiplier = isWinner ? 1.6 : 0.8;
+          p.progress += p.speed * speedMultiplier;
           if (p.progress > 1) p.progress = 0;
 
-          // Interpolation quadratique de Bézier
           const t = p.progress;
           const px = (1 - t) * (1 - t) * qx + 2 * (1 - t) * t * midX + t * t * kx;
           const py = (1 - t) * (1 - t) * qy + 2 * (1 - t) * t * midY + t * t * ky;
 
           this.ctx.beginPath();
-          this.ctx.arc(px, py, 2.2, 0, Math.PI * 2);
-          this.ctx.fillStyle = `rgba(255, 255, 255, ${beamAlpha})`;
+          const pSize = isWinner ? 3.0 : 1.8;
+          this.ctx.arc(px, py, pSize, 0, Math.PI * 2);
+          this.ctx.fillStyle = isWinner ? '#ffffff' : `rgba(255, 255, 255, ${expAlpha * 0.6})`;
           this.ctx.shadowColor = '#38bdf8';
-          this.ctx.shadowBlur = 8;
+          this.ctx.shadowBlur = isWinner ? 12 : 4;
           this.ctx.fill();
         }
       });
+
+      this.ctx.restore();
+    });
+  }
+
+  /**
+   * Ancrages des cibles (K / Keys) :
+   * Point d'impact, pulsation discrète et micro-badge "K_i • α: 0.82"
+   */
+  drawKeyAnchors(timeSec) {
+    this.tokens.forEach((token, idx) => {
+      const alpha = token.alpha;
+      const kx = token.pos.x;
+      const ky = token.pos.y;
+      const isWinner = token === this.argmaxToken && alpha > 0.4;
+
+      this.ctx.save();
+
+      // 1. Onde de choc / pulsation discrète au point d'impact
+      const pulsePhase = (timeSec * 2.2 + idx * 0.35) % 1;
+      const pulseRadius = 5 + pulsePhase * (12 + alpha * 14);
+      const pulseAlpha = (1 - pulsePhase) * (0.25 + alpha * 0.65);
+
+      this.ctx.beginPath();
+      this.ctx.arc(kx, ky, pulseRadius, 0, Math.PI * 2);
+      this.ctx.strokeStyle = isWinner 
+        ? `rgba(56, 189, 248, ${pulseAlpha})` 
+        : `rgba(129, 140, 248, ${pulseAlpha * 0.4})`;
+      this.ctx.lineWidth = isWinner ? 1.4 : 0.8;
+      this.ctx.stroke();
+
+      // 2. Point d'impact focal (Dot central)
+      const dotRadius = isWinner ? 4.5 : 2.5;
+      this.ctx.beginPath();
+      this.ctx.arc(kx, ky, dotRadius, 0, Math.PI * 2);
+      this.ctx.fillStyle = isWinner ? '#38bdf8' : 'rgba(148, 163, 184, 0.7)';
+      this.ctx.shadowColor = '#38bdf8';
+      this.ctx.shadowBlur = isWinner ? 14 : 4;
+      this.ctx.fill();
+
+      // 3. Micro-badge "K_i • α: 0.82" en temps réel
+      if (alpha > 0.06) {
+        const labelText = `${token.keyLabel} • α: ${alpha.toFixed(2)}`;
+        this.ctx.font = '600 10px "JetBrains Mono", monospace';
+        const textW = this.ctx.measureText(labelText).width;
+        const badgeW = textW + 12;
+        const badgeH = 18;
+        const bx = kx + 12;
+        const by = ky - 9;
+
+        // Tracé de la mini-ligne connectrice entre le dot d'impact et le badge
+        this.ctx.beginPath();
+        this.ctx.moveTo(kx + dotRadius, ky);
+        this.ctx.lineTo(bx, by);
+        this.ctx.strokeStyle = isWinner ? 'rgba(56, 189, 248, 0.6)' : 'rgba(255, 255, 255, 0.15)';
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+
+        // Fond du micro-badge
+        this.ctx.fillStyle = isWinner ? 'rgba(10, 14, 24, 0.92)' : 'rgba(10, 14, 24, 0.75)';
+        this.ctx.strokeStyle = isWinner ? 'rgba(56, 189, 248, 0.65)' : 'rgba(255, 255, 255, 0.12)';
+        this.ctx.lineWidth = 1;
+
+        if (this.ctx.roundRect) {
+          this.ctx.beginPath();
+          this.ctx.roundRect(bx, by - badgeH / 2, badgeW, badgeH, 5);
+          this.ctx.fill();
+          this.ctx.stroke();
+        } else {
+          this.ctx.fillRect(bx, by - badgeH / 2, badgeW, badgeH);
+          this.ctx.strokeRect(bx, by - badgeH / 2, badgeW, badgeH);
+        }
+
+        // Texte du badge avec couleur adaptative
+        this.ctx.fillStyle = isWinner ? '#38bdf8' : 'rgba(148, 163, 184, 0.85)';
+        this.ctx.shadowBlur = isWinner ? 8 : 0;
+        this.ctx.fillText(labelText, bx + 6, by + 3.5);
+      }
 
       this.ctx.restore();
     });
@@ -524,9 +635,8 @@ class AttentionEngine {
     const { x, y } = this.mouse;
 
     this.ctx.save();
-    // Réticule du vecteur Query
-    this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
-    this.ctx.lineWidth = 1.2;
+    this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.7)';
+    this.ctx.lineWidth = 1.3;
 
     // Cercle central pulsant
     this.ctx.beginPath();
@@ -546,8 +656,7 @@ class AttentionEngine {
     this.ctx.lineTo(x, y + arm);
     this.ctx.stroke();
 
-    // Label discret 'Q'
-    this.ctx.font = '10px "JetBrains Mono", monospace';
+    this.ctx.font = '600 10px "JetBrains Mono", monospace';
     this.ctx.fillStyle = '#38bdf8';
     this.ctx.fillText('Q', x + 10, y - 10);
 
@@ -555,29 +664,37 @@ class AttentionEngine {
   }
 
   /* --------------------------------------------------------------------------
-   * 5. Effet d'Inclinaison 3D (Tilt) sur la Carte Centrale
+   * 5. Parallaxe 3D Magnétique : La carte s'oriente vers le vecteur d'attention Q
    * -------------------------------------------------------------------------- */
-  initTiltEffect() {
+  updateCardTilt() {
     if (!this.card) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    window.addEventListener('mousemove', (e) => {
-      const bounds = this.card.getBoundingClientRect();
-      const cardCenterX = bounds.left + bounds.width / 2;
-      const cardCenterY = bounds.top + bounds.height / 2;
+    const bounds = this.card.getBoundingClientRect();
+    const cardCenterX = bounds.left + bounds.width / 2;
+    const cardCenterY = bounds.top + bounds.height / 2;
 
-      const diffX = e.clientX - cardCenterX;
-      const diffY = e.clientY - cardCenterY;
+    const diffX = this.mouse.x - cardCenterX;
+    const diffY = this.mouse.y - cardCenterY;
 
-      const rotateY = (diffX / (window.innerWidth / 2)) * 6.5;
-      const rotateX = -(diffY / (window.innerHeight / 2)) * 6.5;
+    // Calcul de l'attraction :
+    // Quand le curseur s'éloigne vers le haut à gauche (diffX < 0, diffY < 0),
+    // la carte pivote vers lui (rotateY négatif, rotateX orienté vers le haut)
+    const targetRy = (diffX / (this.width / 2)) * 7.5;
+    const targetRx = -(diffY / (this.height / 2)) * 7.5;
 
-      this.card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
-    });
+    // Légère translation physique (effet d'aimant vers le vecteur Q)
+    const targetTx = (diffX / (this.width / 2)) * 14;
+    const targetTy = (diffY / (this.height / 2)) * 10;
 
-    window.addEventListener('mouseleave', () => {
-      this.card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
-    });
+    // Lissage dynamique (amortissement physique)
+    const ease = 0.085;
+    this.cardTilt.rx += (targetRx - this.cardTilt.rx) * ease;
+    this.cardTilt.ry += (targetRy - this.cardTilt.ry) * ease;
+    this.cardTilt.tx += (targetTx - this.cardTilt.tx) * ease;
+    this.cardTilt.ty += (targetTy - this.cardTilt.ty) * ease;
+
+    this.card.style.transform = `perspective(1200px) translate3d(${this.cardTilt.tx.toFixed(2)}px, ${this.cardTilt.ty.toFixed(2)}px, 0) rotateX(${this.cardTilt.rx.toFixed(2)}deg) rotateY(${this.cardTilt.ry.toFixed(2)}deg)`;
   }
 
   /* --------------------------------------------------------------------------
@@ -596,14 +713,13 @@ class AttentionEngine {
       });
     }
 
-    // Création initiale des lignes de barres softmax
     if (this.softmaxContainer) {
       this.softmaxContainer.innerHTML = '';
       this.tokens.forEach((token) => {
         const row = document.createElement('div');
         row.className = 'softmax-row';
         row.innerHTML = `
-          <span class="softmax-label">${token.name}</span>
+          <span class="softmax-label">${token.keyLabel} • ${token.name}</span>
           <div class="softmax-track">
             <div class="softmax-fill" id="bar-${token.id}"></div>
           </div>
@@ -617,21 +733,18 @@ class AttentionEngine {
   updateInspectorMetrics() {
     const panel = document.getElementById('inspector-panel');
     if (panel && !panel.hidden) {
-      // Norme ||Q||
       let qnorm = 0;
       for (let i = 0; i < this.d_k; i++) qnorm += this.Q[i] * this.Q[i];
       qnorm = Math.sqrt(qnorm);
       if (this.metricQnorm) this.metricQnorm.textContent = qnorm.toFixed(3);
 
-      // Vitesse
       if (this.metricSpeed) this.metricSpeed.textContent = `${Math.round(this.mouse.speed * 60)} px/s`;
 
-      // Barres de répartition softmax
       this.tokens.forEach((token) => {
         const bar = document.getElementById(`bar-${token.id}`);
         const val = document.getElementById(`val-${token.id}`);
         const percent = Math.round(token.alpha * 100);
-        const isMax = token === this.argmaxToken && token.alpha > 0.35;
+        const isMax = token === this.argmaxToken && token.alpha > 0.4;
 
         if (bar) {
           bar.style.width = `${percent}%`;
