@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 — Ressource introuvable</title>
-  <meta name="description" content="Le conteneur tourne parfaitement, mais la route demandée semble perdue dans le vide intersidéral.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <title>Ph4nt0m // AI & Systems Engineer — Neural Hub</title>
+  <meta name="description" content="Portail personnel et serveur d'ingénierie en Intelligence Artificielle. Fond interactif Attention Heatmap calculant Q·Kᵀ / √dₖ en temps réel.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+
   <script>
     // Résolution dynamique du chemin de base pour GitHub Pages et conteneur Docker
     (function() {
@@ -15,104 +16,226 @@
       document.write('<base href="' + baseDir + '">');
     })();
   </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Canvas d'arrière-plan avec poussière d'étoiles et nébuleuse -->
-  <canvas id="space-canvas"></canvas>
+  <!-- Canvas Attention Heatmap (Calcul Q·Kᵀ / √dₖ en temps réel) -->
+  <canvas id="attention-canvas"></canvas>
 
-  <!-- Lueur ambiante d'arrière-plan -->
-  <div class="ambient-glow glow-top-left"></div>
-  <div class="ambient-glow glow-bottom-right"></div>
+  <!-- Lueur ambiante nébuleuse -->
+  <div class="ambient-glow glow-cyan"></div>
+  <div class="ambient-glow glow-violet"></div>
+
+  <!-- HUD d'attention flottant discret en haut à droite -->
+  <aside class="hud-bar" aria-label="Télémétrie d'attention">
+    <div class="hud-item">
+      <span class="hud-label">Attention Head:</span>
+      <span class="hud-val" id="hud-head">#0 (Spatial)</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Dimension d<sub>k</sub>:</span>
+      <span class="hud-val">32</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Focus Max:</span>
+      <span class="hud-val highlight" id="hud-argmax">Query Init</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">FPS:</span>
+      <span class="hud-val" id="hud-fps">60</span>
+    </div>
+  </aside>
 
   <main class="page-container">
-    <!-- Carte principale 3D -->
-    <div class="error-card" id="tilt-card">
-      <!-- Reflet de lumière sur la bordure -->
+    <!-- Carte Principale 3D (Hub IA) -->
+    <div class="portal-card" id="tilt-card">
       <div class="card-glass-reflection"></div>
 
-      <!-- Badge statut système -->
+      <!-- Badge Supérieur : Mode Transformer -->
       <div class="badge-wrapper">
-        <div class="status-badge" role="status" aria-live="polite">
+        <div class="status-badge" role="status">
           <span class="pulsing-dot" aria-hidden="true"></span>
-          <span class="badge-text">ERREUR SYSTÈME</span>
+          <span class="badge-text">TRANSFORMER RUNTIME // MULTI-HEAD ATTENTION</span>
         </div>
       </div>
 
-      <!-- Code 404 Métallique / 3D -->
-      <div class="code-container">
-        <h1 class="error-code" data-text="404">404</h1>
-      </div>
+      <!-- En-tête Identité (Token Q/K : Hero) -->
+      <header class="profile-header interactive-token" data-token-id="hero" data-token-name="Profil Ph4nt0m">
+        <div class="avatar-container">
+          <div class="avatar-ring"></div>
+          <div class="avatar-glow"></div>
+          <div class="avatar-inner">
+            <svg class="ai-core-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+        </div>
 
-      <!-- Titre & Description -->
-      <div class="message-content">
-        <h2 class="error-title">Ressource introuvable</h2>
-        <p class="error-description">
-          Le conteneur tourne parfaitement, mais la route demandée semble perdue dans le vide intersidéral.
+        <div class="title-group">
+          <h1 class="profile-name">Ph4nt0m</h1>
+          <p class="profile-role">Ingénieur IA & Systèmes Distribués</p>
+        </div>
+
+        <p class="profile-bio">
+          Conception d'architectures d'apprentissage profond, modèles génératifs et inférence haute performance.
+          Explorez mes travaux et services via l'espace latent ci-dessous.
         </p>
-      </div>
 
-      <!-- Boutons d'action -->
-      <div class="action-buttons">
-        <button type="button" class="btn btn-primary" id="btn-retry" aria-label="Réessayer la connexion">
-          <span class="btn-spinner" aria-hidden="true"></span>
-          <span class="btn-text">Réessayer</span>
-        </button>
-        <button type="button" class="btn btn-secondary" id="btn-back" aria-label="Revenir en arrière">
-          <span class="btn-text">Retour</span>
-        </button>
-      </div>
+        <div class="token-score-pill" id="score-hero">
+          <span class="score-label">attn &alpha;</span>
+          <span class="score-val">0.00</span>
+        </div>
+      </header>
 
-      <!-- Informations techniques repliables -->
-      <div class="diagnostics-toggle-container">
-        <button type="button" class="diagnostics-toggle" id="diagnostics-toggle" aria-expanded="false" aria-controls="diagnostics-panel">
-          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Grille des Hub Links (Tokens Interactifs K_i) -->
+      <nav class="hub-grid" aria-label="Navigation du serveur">
+        
+        <!-- Token 1 : Portfolio -->
+        <a href="https://github.com/Ph4nt0m1882" target="_blank" rel="noopener noreferrer" 
+           class="hub-card interactive-token" data-token-id="portfolio" data-token-name="Portfolio">
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+          </div>
+          <div class="card-content">
+            <div class="card-title-row">
+              <h2 class="card-title">Portfolio & Projets</h2>
+              <span class="token-badge" id="score-portfolio">&alpha;: 0.00</span>
+            </div>
+            <p class="card-desc">Réalisations majeures, modèles publiés, benchmarks et architectures ML.</p>
+          </div>
+          <span class="card-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+
+        <!-- Token 2 : Lab IA -->
+        <a href="https://huggingface.co" target="_blank" rel="noopener noreferrer"
+           class="hub-card interactive-token" data-token-id="lab" data-token-name="AI Lab">
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 2v7.31M14 2v7.31M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+              <circle cx="10" cy="15" r="1"></circle>
+              <circle cx="14" cy="16" r="1"></circle>
+            </svg>
+          </div>
+          <div class="card-content">
+            <div class="card-title-row">
+              <h2 class="card-title">Lab & Modèles</h2>
+              <span class="token-badge" id="score-lab">&alpha;: 0.00</span>
+            </div>
+            <p class="card-desc">Expérimentations Transformers, fine-tuning, embeddings et inférence locale.</p>
+          </div>
+          <span class="card-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+
+        <!-- Token 3 : GitHub Repos -->
+        <a href="https://github.com/Ph4nt0m1882" target="_blank" rel="noopener noreferrer"
+           class="hub-card interactive-token" data-token-id="github" data-token-name="GitHub">
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+          </div>
+          <div class="card-content">
+            <div class="card-title-row">
+              <h2 class="card-title">GitHub & Code</h2>
+              <span class="token-badge" id="score-github">&alpha;: 0.00</span>
+            </div>
+            <p class="card-desc">Code source, notebooks interactifs, dépôts et contributions open source.</p>
+          </div>
+          <span class="card-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+
+        <!-- Token 4 : Télémétrie Serveur -->
+        <div class="hub-card interactive-token" data-token-id="server" data-token-name="Système & Docker" role="button" tabindex="0" id="card-server-stats">
+          <div class="card-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
+          <div class="card-content">
+            <div class="card-title-row">
+              <h2 class="card-title">Nœud Serveur</h2>
+              <span class="token-badge" id="score-server">&alpha;: 0.00</span>
+            </div>
+            <p class="card-desc">Conteneur Docker actif, Apache HTTPD, latence réseau et statut des workers.</p>
+          </div>
+          <span class="card-arrow" aria-hidden="true">&bull;</span>
+        </div>
+
+      </nav>
+
+      <!-- Section Inspecteur d'Attention / Tenseurs en direct -->
+      <section class="inspector-section" aria-label="Inspecteur de tenseurs">
+        <button type="button" class="inspector-toggle interactive-token" data-token-id="inspector" data-token-name="Inspecteur" id="inspector-toggle" aria-expanded="false" aria-controls="inspector-panel">
+          <div class="formula-chip">
+            <span class="formula-text">Scores = (Q &middot; K<sup>T</sup>) / &radic;d<sub>k</sub></span>
+          </div>
+          <span class="toggle-text">Inspecter l'Attention &bull; Softmax</span>
+          <svg class="toggle-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-          <span>Détails du conteneur</span>
         </button>
 
-        <div class="diagnostics-panel" id="diagnostics-panel" hidden>
-          <div class="diag-grid">
-            <div class="diag-item">
-              <span class="diag-label">Statut HTTP</span>
-              <span class="diag-value status-error">404 Not Found</span>
+        <div class="inspector-panel" id="inspector-panel" hidden>
+          <div class="panel-header">
+            <span class="panel-tag">DISTRIBUTION SOFTMAX TEMPS RÉEL</span>
+            <div class="head-selector">
+              <span class="label">Tête :</span>
+              <button class="head-btn active" data-head="0">0 (Spatial)</button>
+              <button class="head-btn" data-head="1">1 (Sémantique)</button>
+              <button class="head-btn" data-head="2">2 (Vélocité)</button>
             </div>
-            <div class="diag-item">
-              <span class="diag-label">Conteneur</span>
-              <span class="diag-value" id="diag-server">Apache HTTPD (Alpine/OCP)</span>
+          </div>
+
+          <!-- Barres de répartition softmax -->
+          <div class="softmax-bars" id="softmax-bars">
+            <!-- Rempli dynamiquement par script.js -->
+          </div>
+
+          <div class="tensor-metrics">
+            <div class="metric-item">
+              <span class="metric-label">Vecteur Query ||Q||</span>
+              <span class="metric-val" id="metric-qnorm">0.00</span>
             </div>
-            <div class="diag-item">
-              <span class="diag-label">Route demandée</span>
-              <span class="diag-value code-font" id="diag-route">/</span>
+            <div class="metric-item">
+              <span class="metric-label">Vitesse Curseur</span>
+              <span class="metric-val" id="metric-speed">0 px/s</span>
             </div>
-            <div class="diag-item">
-              <span class="diag-label">Horodatage</span>
-              <span class="diag-value code-font" id="diag-time">--:--:--</span>
+            <div class="metric-item">
+              <span class="metric-label">Température &tau;</span>
+              <span class="metric-val">1.0</span>
             </div>
-            <div class="diag-item">
-              <span class="diag-label">Latence liaison</span>
-              <span class="diag-value status-ok" id="diag-ping">0.4 ms</span>
-            </div>
-            <div class="diag-item">
-              <span class="diag-label">Moteur Docker</span>
-              <span class="diag-value status-ok">En cours d'exécution ●</span>
+            <div class="metric-item">
+              <span class="metric-label">Conteneur</span>
+              <span class="metric-val">Apache / Docker</span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- Lien discret vers la page 404 test -->
+      <footer class="card-footer">
+        <a href="404.html" class="subtle-link" title="Tester la page d'erreur 404">
+          <span class="link-dot"></span>
+          Accéder à la simulation 404
+        </a>
+      </footer>
 
     </div>
 
-    <!-- Notification toast interactive pour le bouton réessayer -->
-    <div class="toast" id="status-toast" role="alert" aria-live="assertive"></div>
-
-    <!-- Footer discret -->
-    <footer class="page-footer">
-      <span>Conteneur propulsé par <code>quay.io/ocp-edge-qe/httpd</code></span>
+    <footer class="main-footer">
+      <span>Propulsé par le conteneur <code>quay.io/ocp-edge-qe/httpd</code> &bull; Calcul d'attention Canvas 60 FPS</span>
     </footer>
   </main>
 

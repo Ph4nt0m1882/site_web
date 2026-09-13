@@ -1,85 +1,84 @@
-# Site Web d'Erreur 404 — Style Moderne & Spatial
+# Ph4nt0m // AI & Systems Engineer — Neural Hub
 
-Ce site web statique haute fidélité reproduit une interface moderne d'erreur système / ressource introuvable (404), optimisée pour tourner directement sur un conteneur Apache HTTPD (`quay.io/ocp-edge-qe/httpd`).
+Page d'accueil moderne pour serveur d'ingénierie en Intelligence Artificielle, dotée d'une carte centrale en verre dépoli (glassmorphism 3D réagissant au curseur) et d'un arrière-plan interactif **Attention Heatmap** simulant en temps réel le calcul d'attention d'un **Transformer** :
+
+$$\text{Scores} = \frac{Q \cdot K^T}{\sqrt{d_k}}$$
+
+La page d'erreur système originale reste active sur [`404.html`](404.html) pour intercepter toute route invalide.
 
 ---
 
-## 🎨 Fonctionnalités
+## 🧠 Mécanique Visuelle & Mathématique
 
-- **Fidélité visuelle** : Carte sombre flottante, fond spatial profond avec halos pourpres/rouges, badge avec diode lumineuse pulsante `ERREUR SYSTÈME`.
-- **404 Métallique 3D** : Typographie monumentale avec dégradé chromé et ombrage en profondeur.
-- **Effet 3D Tilt interactif** : La carte réagit dynamiquement aux mouvements de la souris en perspective tridimensionnelle.
-- **Fond Cosmique dynamique** : Particules d'étoiles animées avec scintillement sur `<canvas>` léger et fluide.
-- **Détails techniques du conteneur** : Panneau escamotable affichant la route demandée, le serveur HTTPD, la latence et l'horodatage.
-- **Bouton « Réessayer » actif** : Teste réellement la route via une requête `HEAD` HTTP et affiche une notification avec retour haptique visuel.
-- **Compatibilité Apache** : Livré avec `index.html`, `404.html` et `.htaccess`.
+1. **Curseur = Query ($Q$)** :
+   - Projette un vecteur latent dynamique en dimension $d_k = 32$.
+   - Combine les coordonnées d'écran normalisées $(u, v)$, la vélocité $(\Delta x, \Delta y)$, un **Positional Encoding sinusoïdal** 2D et des harmoniques temporelles.
+2. **Éléments Interactifs & Grille = Keys ($K$) et Values ($V$)** :
+   - Les boutons et blocs du Hub (Portfolio, Lab IA, GitHub, Nœud Serveur) possèdent chacun leur embedding caractéristique.
+   - Une grille de patchs spatiaux (style Vision Transformer / ViT) couvre le fond d'écran.
+3. **Calcul d'Attention & Softmax à 60 FPS** :
+   - Évaluation instantanée du produit scalaire mis à l'échelle : $\text{Scores} = \frac{Q \cdot K^T}{\sqrt{d_k}}$.
+   - Normalisation Softmax : $\alpha_i = \frac{\exp(s_i / \tau)}{\sum_j \exp(s_j / \tau)}$.
+   - Affichage d'une **heatmap thermique Cyberpunk/Inferno**, de **faisceaux synaptiques lumineux** reliant $Q$ aux cibles actives, et de jauges d'attention $\alpha$ en temps réel sur chaque carte.
+   - **Inspecteur de Tenseurs repliable** pour examiner la distribution Softmax et basculer entre différentes têtes d'attention (Spatial, Sémantique, Vélocité).
+
+---
+
+## 📁 Structure des Fichiers
+
+```
+/home/phantom/Workspaces/site_web/
+├── index.html        # Hub d'accueil IA (Attention Heatmap, carte 3D, tokens K_i)
+├── style.css         # Styles modernes pour le hub IA, la heatmap et les jauges
+├── script.js         # Moteur mathématique d'Attention (Q, K, Softmax, Canvas 60 FPS)
+├── 404.html          # Page d'erreur système 404 (indépendante)
+├── 404.css           # Styles dédiés pour la page 404
+├── 404.js            # Script dédié pour la page 404
+├── httpd.conf        # Configuration Apache avec routage ErrorDocument 404
+├── .htaccess         # Directives Apache
+├── .nojekyll         # Compatibilité GitHub Pages
+├── .github/
+│   └── workflows/
+│       └── deploy.yml # Déploiement automatique GitHub Pages
+├── docker-compose.yml # Fichier Docker Compose
+├── run.sh            # Script de lancement rapide
+└── README.md         # Documentation
+```
 
 ---
 
 ## 🚀 Démarrage avec Docker
 
-### Option 1 : Votre commande personnalisée (en montant le dossier actuel)
+### Option 1 : Votre commande personnalisée (en montant `/tmp`)
 
-Depuis le dossier du projet :
+Les fichiers ont déjà été synchronisés dans `/tmp` :
 
 ```bash
-# Servir la page directement à la racine (index.html)
-docker run -p 80:80 -v "$(pwd)":/usr/local/apache2/htdocs/:ro -d quay.io/ocp-edge-qe/httpd
+docker run -p 80:80 -v /tmp:/usr/local/apache2/htdocs/:ro -d quay.io/ocp-edge-qe/httpd
+```
 
-# OU avec redirection 404 native d'Apache sur n'importe quelle URL inconnue :
+### Option 2 : Depuis le dossier du projet (avec redirection 404 native)
+
+```bash
 docker run -p 80:80 \
   -v "$(pwd)":/usr/local/apache2/htdocs/:ro \
   -v "$(pwd)/httpd.conf":/usr/local/apache2/conf/httpd.conf:ro \
   -d quay.io/ocp-edge-qe/httpd
 ```
 
-### Option 2 : En montant `/tmp` (comme dans votre exemple)
-
-Si vous copiez les fichiers dans `/tmp` :
+### Option 3 : Avec le script fourni ou Docker Compose
 
 ```bash
-cp -r /home/phantom/Workspaces/site_web/* /tmp/
-docker run -p 80:80 -v /tmp:/usr/local/apache2/htdocs/:ro -d quay.io/ocp-edge-qe/httpd
-```
-
-### Option 3 : Avec le script fourni
-
-```bash
-chmod +x run.sh
-./run.sh 8080   # Remplacez 8080 par le port désiré (ex: 80)
-```
-
-### Option 4 : Avec Docker Compose
-
-```bash
+./run.sh 80
+# OU
 docker compose up -d
 ```
 
 ---
 
-## 🌐 Accès
+## 🌐 Déploiement GitHub Pages
 
-Une fois le conteneur démarré :
-- Page d'accueil : [http://localhost](http://localhost) (ou [http://localhost:8080](http://localhost:8080))
-- Test d'une route inconnue (404) : [http://localhost/route-inexistante](http://localhost/route-inexistante)
-
----
-
-## 🚀 Déploiement GitHub Pages
-
-Un workflow GitHub Actions automatisé est configuré dans `.github/workflows/deploy.yml`.
-
-### Configuration sur GitHub :
-1. Poussez votre branche sur GitHub :
-   ```bash
-   git add .
-   git commit -m "feat: add GitHub Pages deployment workflow"
-   git push origin main
-   ```
-2. Rendez-vous sur votre dépôt GitHub : **Settings** > **Pages**.
-3. Dans la section **Build and deployment** :
-   - Sous **Source**, sélectionnez **GitHub Actions**.
-4. Le déploiement s'exécutera automatiquement à chaque push sur la branche `main`.
-5. Votre site sera accessible à l'adresse :
-   **`https://<votre-compte>.github.io/site_web/`** (par exemple `https://Ph4nt0m1882.github.io/site_web/`)
-
+Le workflow automatique [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) est préconfiguré :
+1. Poussez vers GitHub : `git push origin main`
+2. Dans **Settings** > **Pages** sur GitHub, choisissez la source **GitHub Actions**.
+3. Votre hub sera en ligne sur `https://<compte>.github.io/site_web/`.
