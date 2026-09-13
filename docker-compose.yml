@@ -1,10 +1,29 @@
 services:
-  httpd:
-    image: quay.io/ocp-edge-qe/httpd
-    container_name: web-404-service
+  ai-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-hub:latest
+    container_name: ai-hub
+    restart: ${RESTART_POLICY:-unless-stopped}
     ports:
-      - "80:80"
+      # Écoute sur l'interface locale 127.0.0.1 pour éviter tout conflit avec Pi-hole ou Nginx
+      - "127.0.0.1:${PORT:-8085}:80"
     volumes:
-      - .:/usr/local/apache2/htdocs/:ro
-      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
-    restart: unless-stopped
+      # Montage en lecture seule pour pouvoir modifier public/ sans devoir reconstruire l'image
+      - ./public:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 64M
+        reservations:
+          memory: 16M
+    # Décommentez ci-dessous si votre Nginx Reverse Proxy tourne dans un réseau Docker dédié :
+    # networks:
+    #   - nginx-proxy-net
+
+# networks:
+#   nginx-proxy-net:
+#     external: true
