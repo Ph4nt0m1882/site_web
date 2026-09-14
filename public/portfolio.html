@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ph4nt0m // Portfolio & Travaux IA</title>
+  <meta name="description" content="Portfolio d'ingénierie en Intelligence Artificielle, modèles de fondation, architectures distribuées et inférence haute performance.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
+
+  <script>
+    // Résolution dynamique du chemin de base pour GitHub Pages et conteneur Docker
+    (function() {
+      var isGH = window.location.hostname.endsWith('github.io');
+      var segments = window.location.pathname.split('/').filter(Boolean);
+      var baseDir = isGH && segments.length > 0 ? '/' + segments[0] + '/' : '/';
+      document.write('<base href="' + baseDir + '">');
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portfolio.css">
+</head>
+<body>
+  <!-- Halos d'ambiance cosmique -->
+  <div class="ambient-glow glow-cyan"></div>
+  <div class="ambient-glow glow-violet"></div>
+
+  <!-- Barre de navigation supérieure -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="./" class="nav-back-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Neural Hub</span>
+      </a>
+
+      <div class="nav-brand">
+        <span class="brand-name">Ph4nt0m</span>
+        <span class="brand-sep">//</span>
+        <span class="brand-section">PORTFOLIO</span>
+      </div>
+
+      <div class="nav-status">
+        <span class="status-dot"></span>
+        <span class="status-text">SYS::ONLINE</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="content-wrapper">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span class="badge-text">INGÉNIERIE IA &bull; MODÈLES DE FONDATION &bull; RUNTIMES</span>
+      </div>
+
+      <h1 class="hero-title">
+        Architectures d'IA, <br>
+        <span class="gradient-text">Espaces Latents & Systèmes</span>
+      </h1>
+
+      <p class="hero-desc">
+        Conception, entraînement et déploiement de modèles d'apprentissage profond (Transformers, LLMs, Vision-Language).
+        De l'optimisation bas-niveau (CUDA, vLLM, quantization) aux applications distribuées scalables.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#projets" class="btn btn-primary">
+          <span>Explorer les Projets</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </a>
+        <a href="https://github.com/Ph4nt0m1882" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+          </svg>
+          <span>Profil GitHub</span>
+        </a>
+      </div>
+
+      <!-- Métriques Clés / Tenseurs -->
+      <div class="stats-strip">
+        <div class="stat-card">
+          <span class="stat-num">d<sub>k</sub> = 32</span>
+          <span class="stat-label">Optimisation Attention & KV-Cache</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">ARM64</span>
+          <span class="stat-label">Edge AI & Embarqué (RPi 5)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">60 FPS</span>
+          <span class="stat-label">Calcul Vectoriel Canvas en direct</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">Open Source</span>
+          <span class="stat-label">Dépôts, Notebooks & Modèles</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Projets Phares -->
+    <section class="section-container" id="projets">
+      <div class="section-header">
+        <div class="section-tag">RÉALISATIONS &bull; PROJETS PHARES</div>
+        <h2 class="section-title">Systèmes & Modèles Déployés</h2>
+      </div>
+
+      <div class="projects-grid">
+        
+        <!-- Projet 1 : Inférence LLM & KV-Cache -->
+        <article class="project-card">
+          <div class="project-top">
+            <div class="project-num">01 // INFERENCE</div>
+            <div class="project-status">En production</div>
+          </div>
+          <h3 class="project-title">Moteur d'Inférence LLM & Optimisation KV-Cache</h3>
+          <p class="project-desc">
+            Architecture de service d'inférence pour LLMs avec gestion avancée de PagedAttention, 
+            quantification AWQ/INT4 et batching dynamique continu. Réduction de 65% de l'empreinte VRAM 
+            et accélération du débit de tokens par seconde.
+          </p>
+          <div class="project-tags">
+            <span class="tag">PyTorch</span>
+            <span class="tag">CUDA</span>
+            <span class="tag">vLLM</span>
+            <span class="tag">PagedAttention</span>
+            <span class="tag">Docker</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/Ph4nt0m1882" target="_blank" rel="noopener noreferrer" class="proj-link">
+              <span>Code source &bull; GitHub</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </div>
+        </article>
+
+        <!-- Projet 2 : Agent Multi-Modal -->
+        <article class="project-card">
+          <div class="project-top">
+            <div class="project-num">02 // MULTIMODAL</div>
+            <div class="project-status">Recherche & Lab</div>
+          </div>
+          <h3 class="project-title">Agent Vision-Langage Autonome (VLM)</h3>
+          <p class="project-desc">
+            Pipeline multimodal couplant encodeur visuel SigLIP et modèle de langage fine-tuné par LoRA. 
+            Permet l'analyse d'images complexes, la détection d'anomalies visuelles et le raisonnement pas à pas (Chain-of-Thought).
+          </p>
+          <div class="project-tags">
+            <span class="tag">Vision-Transformer</span>
+            <span class="tag">SigLIP</span>
+            <span class="tag">LoRA / PEFT</span>
+            <span class="tag">FastAPI</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/Ph4nt0m1882" target="_blank" rel="noopener noreferrer" class="proj-link">
+              <span>Code source &bull; GitHub</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </div>
+        </article>
+
+        <!-- Projet 3 : RAG & Base Vectorielle -->
+        <article class="project-card">
+          <div class="project-top">
+            <div class="project-num">03 // RETRIEVAL</div>
+            <div class="project-status">Déployé</div>
+          </div>
+          <h3 class="project-title">Pipeline RAG Hybride & Base Vectorielle Qdrant</h3>
+          <p class="project-desc">
+            Système de génération augmentée par récupération combinant recherche vectorielle dense et recherche lexicale BM25.
+            Reranking dynamique par cross-encoder pour éliminer les hallucinations sur corpus documentaire technique.
+          </p>
+          <div class="project-tags">
+            <span class="tag">Qdrant</span>
+            <span class="tag">Embeddings</span>
+            <span class="tag">Hybrid Search</span>
+            <span class="tag">AsyncIO</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/Ph4nt0m1882" target="_blank" rel="noopener noreferrer" class="proj-link">
+              <span>Code source &bull; GitHub</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </div>
+        </article>
+
+        <!-- Projet 4 : Edge AI sur RPi 5 -->
+        <article class="project-card">
+          <div class="project-top">
+            <div class="project-num">04 // EMBEDDED AI</div>
+            <div class="project-status">Actif sur ce serveur</div>
+          </div>
+          <h3 class="project-title">Edge AI & Micro-Services Embarqués (Raspberry Pi 5)</h3>
+          <p class="project-desc">
+            Orchestration Docker multi-conteneurs pour inférence de modèles de langage compacts (SLMs GGUF via llama.cpp/Ollama) 
+            sur ARM64, optimisée pour cohabiter avec Nginx et Pi-hole dans 3 Go de RAM.
+          </p>
+          <div class="project-tags">
+            <span class="tag">ARM64</span>
+            <span class="tag">RPi 5</span>
+            <span class="tag">Ollama</span>
+            <span class="tag">Nginx Alpine</span>
+          </div>
+          <div class="project-links">
+            <a href="./" class="proj-link">
+              <span>Voir le Neural Hub</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+        </article>
+
+        <!-- Projet 5 : Visualiseur Attention Transformer -->
+        <article class="project-card">
+          <div class="project-top">
+            <div class="project-num">05 // VISUAL ENGINE</div>
+            <div class="project-status">Live Interactive</div>
+          </div>
+          <h3 class="project-title">Moteur Graphique Attention Transformer (Canvas 60 FPS)</h3>
+          <p class="project-desc">
+            Visualisation interactive du produit scalaire mis à l'échelle (Q&middot;K<sup>T</sup> / &radic;d<sub>k</sub>).
+            Calcul du Softmax en direct, faisceaux synaptiques exponentiels et parallaxe 3D magnétique réactive.
+          </p>
+          <div class="project-tags">
+            <span class="tag">Linear Algebra</span>
+            <span class="tag">Softmax</span>
+            <span class="tag">HTML5 Canvas</span>
+            <span class="tag">UI/UX 3D</span>
+          </div>
+          <div class="project-links">
+            <a href="./" class="proj-link">
+              <span>Tester sur la page d'accueil</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Section Compétences & Stack Technique -->
+    <section class="section-container" id="competences">
+      <div class="section-header">
+        <div class="section-tag">STACK & EXPERTISE</div>
+        <h2 class="section-title">Compétences Techniques</h2>
+      </div>
+
+      <div class="skills-grid">
+        <div class="skill-category">
+          <h3 class="category-title">Deep Learning & Modélisation</h3>
+          <ul class="skill-list">
+            <li>PyTorch & TorchScript</li>
+            <li>Transformers & Hugging Face</li>
+            <li>LoRA, QLoRA & PEFT</li>
+            <li>Architectures Diffusion & VAE</li>
+            <li>Apprentissage par Renforcement (RLHF)</li>
+          </ul>
+        </div>
+
+        <div class="skill-category">
+          <h3 class="category-title">Systèmes, HPC & Inférence</h3>
+          <ul class="skill-list">
+            <li>CUDA & Programmation GPU</li>
+            <li>vLLM, TensorRT-LLM & PagedAttention</li>
+            <li>Quantification (AWQ, GPTQ, GGUF)</li>
+            <li>Docker, Docker Compose & Linux Kernel</li>
+            <li>Optimisation mémoire & profilage Nsight</li>
+          </ul>
+        </div>
+
+        <div class="skill-category">
+          <h3 class="category-title">Langages & Ingénierie</h3>
+          <ul class="skill-list">
+            <li>Python (Expert, AsyncIO, NumPy)</li>
+            <li>C++ (Systèmes & Interop FFI)</li>
+            <li>Bash & Automatisation Shell</li>
+            <li>JavaScript & Visualisation Canvas</li>
+            <li>Git, CI/CD GitHub Actions & Nginx</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Contact & Pied de page -->
+    <section class="section-container" id="contact">
+      <div class="contact-card">
+        <h2 class="contact-title">Entrons en contact</h2>
+        <p class="contact-desc">
+          Intéressé par une collaboration sur des projets IA, du conseil en optimisation d'inférence ou une discussion technique ?
+        </p>
+        <div class="contact-buttons">
+          <a href="https://github.com/Ph4nt0m1882" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            <span>GitHub @Ph4nt0m1882</span>
+          </a>
+          <a href="./" class="btn btn-secondary">
+            <span>Retour au Neural Hub</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+</body>
+</html>
