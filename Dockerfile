@@ -1,7 +1,7 @@
 # Image ultra-légère multi-architecture officielle (compatible nativement ARM64 / RPi 5 & x86_64)
 FROM nginx:alpine
 
-LABEL maintainer="Ph4nt0m"
+LABEL maintainer="Phantom"
 LABEL description="AI Systems Neural Hub & Static Server for Raspberry Pi 5"
 
 # Remplacement de la configuration Nginx par défaut

@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantom (Aymeric BARRETO) // AI & Systems Engineer — Neural Hub</title>
+  <title>Phantom (Aymeric BARRETO) // AI & Systems Engineer — Hub</title>
   <meta name="description" content="Portail personnel et serveur d'ingénierie en Intelligence Artificielle. Fond interactif Attention Heatmap calculant Q·Kᵀ / √dₖ en temps réel.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>">
 
   <script>
     // Résolution dynamique du chemin de base pour GitHub Pages et conteneur Docker
@@ -64,7 +64,7 @@
       </div>
 
       <!-- En-tête Identité (Token Q/K : Hero) -->
-      <header class="profile-header interactive-token" data-token-id="hero" data-token-name="Profil Ph4nt0m">
+      <header class="profile-header interactive-token" data-token-id="hero" data-token-name="Profil Phantom">
         <div class="avatar-container">
           <div class="avatar-ring"></div>
           <div class="avatar-glow"></div>
@@ -78,7 +78,7 @@
         </div>
 
         <div class="title-group">
-          <h1 class="profile-name">Ph4nt0m</h1>
+          <h1 class="profile-name">Phantom (Aymeric BARRETO)</h1>
           <p class="profile-role">Ingénieur IA & Systèmes Distribués</p>
         </div>
 
@@ -178,10 +178,12 @@
       <!-- Section Inspecteur d'Attention / Tenseurs en direct -->
       <section class="inspector-section" aria-label="Inspecteur de tenseurs">
         <button type="button" class="inspector-toggle interactive-token" data-token-id="inspector" data-token-name="Inspecteur" id="inspector-toggle" aria-expanded="false" aria-controls="inspector-panel">
-          <div class="formula-chip">
-            <span class="formula-text">Scores = (Q &middot; K<sup>T</sup>) / &radic;d<sub>k</sub></span>
+          <div class="inspector-toggle-left">
+            <svg class="toggle-icon-lead" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20V10M18 20V4M6 20v-4"></path>
+            </svg>
+            <span class="toggle-text">Inspecter l'Attention &bull; Softmax</span>
           </div>
-          <span class="toggle-text">Inspecter l'Attention &bull; Softmax</span>
           <svg class="toggle-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>

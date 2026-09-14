@@ -50,7 +50,7 @@ class AttentionEngine {
 
     // Tokens DOM interactifs (Keys & Values)
     this.tokens = [
-      { id: 'hero', keyLabel: 'K₀', name: 'Profil Ph4nt0m', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
+      { id: 'hero', keyLabel: 'K₀', name: 'Profil Phantom', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
       { id: 'portfolio', keyLabel: 'K₁', name: 'Portfolio', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
       { id: 'lab', keyLabel: 'K₂', name: 'AI Lab', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },
       { id: 'github', keyLabel: 'K₃', name: 'GitHub', elem: null, badge: null, pos: { x: 0, y: 0 }, K: null, score: 0, alpha: 0 },

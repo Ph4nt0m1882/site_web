@@ -1,4 +1,4 @@
-# Ph4nt0m // AI & Systems Engineer — Neural Hub (Raspberry Pi 5 Edition)
+# Phantom // AI & Systems Engineer — Neural Hub (Raspberry Pi 5 Edition)
 
 Portail personnel et serveur d'accueil pour projets d'Intelligence Artificielle, optimisé pour un déploiement ultra-léger et économe en ressources sur **Raspberry Pi 5 (ARM64, 3 Go de RAM)** aux côtés de **Pi-hole** et d'un **reverse proxy Nginx**.
 
